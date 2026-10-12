@@ -1,0 +1,8 @@
+{
+  "name": "WheelsCare Auto Workshop",
+  "description": "Modern auto-workshop platform with vehicle service booking, digital job cards, customer & staff portals, and real-time repair tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

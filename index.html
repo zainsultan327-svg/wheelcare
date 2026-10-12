@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WheelsCare – Modern Digital Management for Automotive Workshops</title>
+  <meta name="description" content="Streamline digital job cards, spare parts inventory, mechanic assignments, and billing in one unified automotive software platform." />
+
+  <!-- Bootstrap 5.3 CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --wc-bg-base: #070d18;
+      --wc-bg-surface: #0e1726;
+      --wc-bg-card: #142034;
+      --wc-bg-elevated: #1a2a44;
+      --wc-border: #1f3354;
+      --wc-border-subtle: #17263e;
+      --wc-red: #dc2626;
+      --wc-red-hover: #b91c1c;
+      --wc-blue: #2563eb;
+      --wc-text-primary: #f8fafc;
+      --wc-text-secondary: #94a3b8;
+      --wc-text-muted: #64748b;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--wc-bg-base);
+      color: var(--wc-text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* MODERN NAVBAR */
+    #main-navbar {
+      background: rgba(14, 23, 38, 0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--wc-border);
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+    }
+
+    .nav-link-item {
+      color: var(--wc-text-secondary);
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 0.5rem 0.95rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .nav-link-item:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-link-item.active {
+      color: #ffffff;
+      background: var(--wc-bg-card);
+      border: 1px solid var(--wc-border);
+    }
+
+    /* CARDS */
+    .wc-card {
+      background-color: var(--wc-bg-surface);
+      border: 1px solid var(--wc-border);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .wc-card-inner {
+      background-color: var(--wc-bg-card);
+      border: 1px solid var(--wc-border);
+      border-radius: 10px;
+    }
+
+    .wc-card-elevated {
+      background-color: var(--wc-bg-elevated);
+      border: 1px solid var(--wc-border);
+      border-radius: 10px;
+    }
+
+    /* FORM INPUTS & VALIDATION FEEDBACK */
+    .form-control, .form-select {
+      background-color: var(--wc-bg-base) !important;
+      border: 1px solid var(--wc-border) !important;
+      color: #ffffff !important;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--wc-blue) !important;
+      box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25) !important;
+    }
+
+    .form-control::placeholder {
+      color: var(--wc-text-muted) !important;
+    }
+
+    /* Clear Visual Feedback for .is-invalid (RED) */
+    .form-control.is-invalid, .form-select.is-invalid {
+      border-color: #dc2626 !important;
+      box-shadow: 0 0 0 0.2rem rgba(220, 38, 38, 0.25) !important;
+      background-image: none !important;
+    }
+
+    /* Clear Visual Feedback for .is-valid (GREEN) */
+    .form-control.is-valid, .form-select.is-valid {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25) !important;
+      background-image: none !important;
+    }
+
+    /* Invalid Feedback Message text styling */
+    .invalid-feedback {
+      color: #f87171 !important;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.35rem;
+      display: none;
+    }
+
+    .form-control.is-invalid ~ .invalid-feedback,
+    .form-select.is-invalid ~ .invalid-feedback,
+    .input-group.has-validation > .form-control.is-invalid ~ .invalid-feedback {
+      display: block !important;
+    }
+
+    /* Valid Feedback optional indicator */
+    .valid-feedback {
+      color: #34d399 !important;
+      font-size: 0.78rem;
+      font-weight: 500;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .form-control.is-valid ~ .valid-feedback {
+      display: block !important;
+    }
+
+    /* STATUS BADGES */
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      padding: 0.35em 0.7em;
+      border-radius: 6px;
+    }
+
+    .status-approved {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pending {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-suspended {
+      background-color: rgba(220, 38, 38, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.3);
+    }
+
+    /* TABLES */
+    .table-dark-custom {
+      --bs-table-bg: var(--wc-bg-surface);
+      --bs-table-border-color: var(--wc-border);
+      --bs-table-hover-bg: rgba(26, 42, 68, 0.4);
+    }
+
+    .table-dark-custom th {
+      background-color: var(--wc-bg-card);
+      color: var(--wc-text-secondary);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-weight: 700;
+    }
+
+    /* VIEW SWITCHING ANIMATION */
+    .app-view {
+      display: none;
+      animation: fadeInView 0.2s ease-in-out;
+    }
+
+    .app-view.active-view {
+      display: block;
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* PRINT RECEIPT SLIP */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-modal-content, #print-modal-content * {
+        visibility: visible;
+      }
+      #print-modal-content {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        color: #000 !important;
+        background: #fff !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================= -->
+  <!-- 1. MODERN NAVBAR (CLEAN & ACCESSIBLE TO EVERYONE)         -->
+  <!-- ========================================================= -->
+  <header id="main-navbar" class="py-2.5 px-3">
+    <div class="container-fluid max-w-7xl d-flex align-items-center justify-content-between gap-3">
+      <!-- Brand Logo -->
+      <a href="javascript:void(0)" onclick="navigateTo('home')" class="d-flex align-items-center gap-2.5 text-decoration-none">
+        <div class="p-2 rounded-3 bg-danger text-white d-flex align-items-center justify-center shadow-sm">
+          <i class="bi bi-wrench-adjustable fs-5"></i>
+        </div>
+        <div>
+          <div class="fw-bold fs-5 text-white lh-1">
+            Wheels<span class="text-danger">Care</span>
+          </div>
+          <div class="text-secondary font-mono-code" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+            WORKSHOP MANAGEMENT
+          </div>
+        </div>
+      </a>
+
+      <!-- Public Navigation Links -->
+      <nav class="d-flex align-items-center gap-1">
+        <a id="nav-home" onclick="navigateTo('home')" class="nav-link-item active">
+          <i class="bi bi-house-door"></i> Home
+        </a>
+        <a id="nav-features" onclick="scrollToFeatures()" class="nav-link-item">
+          <i class="bi bi-grid"></i> Features
+        </a>
+        <a id="nav-contact" onclick="navigateTo('contact')" class="nav-link-item">
+          <i class="bi bi-envelope"></i> Contact Us
+        </a>
+
+        <!-- Logged-in Portal Links -->
+        <a id="nav-workspace-link" onclick="navigateTo('workspace')" class="nav-link-item d-none">
+          <i class="bi bi-speedometer2 text-danger"></i> Workshop Portal
+        </a>
+        <a id="nav-admin-link" onclick="navigateTo('admin')" class="nav-link-item d-none">
+          <i class="bi bi-shield-lock text-primary"></i> Admin Console
+        </a>
+      </nav>
+
+      <!-- Right-Side Action Buttons -->
+      <div class="d-flex align-items-center gap-2">
+        <!-- Guest Visitor Buttons -->
+        <div id="auth-actions-guest" class="d-flex align-items-center gap-2">
+          <button onclick="navigateTo('login')" class="btn btn-outline-light btn-sm px-3 fw-semibold">
+            Sign In
+          </button>
+          <button onclick="navigateTo('register')" class="btn btn-danger btn-sm px-3 fw-bold shadow-sm">
+            Register Workshop
+          </button>
+        </div>
+
+        <!-- Logged-in User Account Info -->
+        <div id="auth-actions-user" class="d-none align-items-center gap-2">
+          <div class="text-end d-none d-sm-block lh-1">
+            <div id="user-display-name" class="fw-bold text-white small">User</div>
+            <span id="user-display-badge" class="badge bg-secondary font-mono-code" style="font-size: 0.65rem;">ROLE</span>
+          </div>
+          <button onclick="handleLogout()" class="btn btn-outline-danger btn-sm py-1 px-2.5" title="Sign Out">
+            <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- PERSISTENT NOTIFICATION BANNER (CLEAN & SUBTLE)           -->
+  <!-- ========================================================= -->
+  <div id="status-notification-banner" class="d-none alert alert-warning border-0 rounded-0 mb-0 py-2.5 px-3 text-center">
+    <div class="container-fluid max-w-7xl d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2 text-start">
+        <i class="bi bi-info-circle-fill fs-5 text-warning"></i>
+        <div class="small">
+          <strong id="banner-title">Registration Submitted: Pending Admin Approval.</strong>
+          <span id="banner-message" class="ms-1">Your commercial workshop license application is under review by WheelsCare administrators.</span>
+        </div>
+      </div>
+      <button onclick="dismissNotificationBanner()" class="btn btn-sm btn-link text-dark p-0 text-decoration-none">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MAIN ROUTED VIEWS                                         -->
+  <!-- ========================================================= -->
+  <main class="flex-grow-1">
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 1: HOME PAGE (Clean SaaS Showcase)                 -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-home" class="app-view active-view">
+      <!-- Modern Hero Section -->
+      <section class="py-5 border-bottom border-secondary border-opacity-25" style="background: radial-gradient(circle at 75% 25%, rgba(220, 38, 38, 0.12), transparent 50%), radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.08), transparent 50%);">
+        <div class="container py-4">
+          <div class="row align-items-center g-5">
+            <!-- Left Column: Copy & Actions -->
+            <div class="col-lg-7">
+              <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-danger bg-opacity-10 border border-danger border-opacity-25 text-danger small fw-semibold mb-3">
+                <i class="bi bi-lightning-charge-fill"></i> Cloud Auto-Workshop Software
+              </div>
+
+              <h1 class="display-4 fw-extrabold text-white mb-3 lh-sm">
+                Modern Digital Management for <br />
+                <span class="text-danger">Automotive Workshops</span>
+              </h1>
+
+              <p class="lead text-secondary mb-4 fs-6">
+                Streamline digital job cards, spare parts inventory, mechanic assignments, and billing in one unified platform.
+              </p>
+
+              <div class="d-flex flex-wrap gap-3">
+                <button onclick="navigateTo('register')" class="btn btn-danger btn-lg px-4 fw-bold shadow-lg d-flex align-items-center gap-2">
+                  <span>Get Started</span>
+                  <i class="bi bi-arrow-right"></i>
+                </button>
+                <button onclick="navigateTo('contact')" class="btn btn-outline-light btn-lg px-4 fw-semibold d-flex align-items-center gap-2">
+                  <i class="bi bi-chat-dots"></i>
+                  <span>Contact Support</span>
+                </button>
+              </div>
+
+              <!-- Quick Metrics Row -->
+              <div class="row g-3 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <div class="col-4">
+                  <div class="fs-4 fw-bold text-white font-mono-code">14,800+</div>
+                  <div class="small text-secondary">Vehicles Serviced</div>
+                </div>
+                <div class="col-4">
+                  <div class="fs-4 fw-bold text-white font-mono-code">99.8%</div>
+                  <div class="small text-secondary">System Uptime</div>
+                </div>
+                <div class="col-4">
+                  <div class="fs-4 fw-bold text-danger font-mono-code">35+</div>
+                  <div class="small text-secondary">Active Service Bays</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Sleek Software Highlights Card -->
+            <div class="col-lg-5">
+              <div class="wc-card p-4 border-secondary border-opacity-50 shadow-2xl">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <span class="badge bg-danger font-mono-code">SOFTWARE HIGHLIGHTS</span>
+                  <span class="badge bg-dark border border-secondary font-mono-code text-secondary">ALL-IN-ONE POS</span>
+                </div>
+
+                <div class="space-y-3">
+                  <!-- Highlight 1: Digital Job Cards -->
+                  <div class="p-3 wc-card-inner rounded-3 mb-2.5 d-flex align-items-start gap-3">
+                    <div class="p-2.5 rounded-3 bg-danger bg-opacity-20 text-danger fs-5 mt-0.5">
+                      <i class="bi bi-lightning-fill"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-white fs-6">Fast Digital Job Cards</div>
+                      <div class="text-secondary small">Paperless intake, fault tracking, and live bay assignments in under 60 seconds.</div>
+                    </div>
+                  </div>
+
+                  <!-- Highlight 2: Spare-Parts Tracking -->
+                  <div class="p-3 wc-card-inner rounded-3 mb-2.5 d-flex align-items-start gap-3">
+                    <div class="p-2.5 rounded-3 bg-primary bg-opacity-20 text-primary fs-5 mt-0.5">
+                      <i class="bi bi-box-seam-fill"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-white fs-6">Live Spare-Parts Tracking</div>
+                      <div class="text-secondary small">Automated stock deductions when components are installed with reorder alerts.</div>
+                    </div>
+                  </div>
+
+                  <!-- Highlight 3: Automated Invoicing -->
+                  <div class="p-3 wc-card-inner rounded-3 mb-3 d-flex align-items-start gap-3">
+                    <div class="p-2.5 rounded-3 bg-success bg-opacity-20 text-success fs-5 mt-0.5">
+                      <i class="bi bi-receipt"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold text-white fs-6">Automated Invoicing & Billing</div>
+                      <div class="text-secondary small">Instant calculations of parts, fluids, and labor with printable thermal receipts.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <button onclick="navigateTo('register')" class="btn btn-outline-danger w-100 fw-bold py-2 mt-1">
+                  Create Workshop Account <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Platform Features Grid -->
+      <section id="features-section" class="py-5">
+        <div class="container py-3">
+          <div class="text-center max-w-2xl mx-auto mb-5">
+            <span class="text-danger fw-bold text-uppercase small font-mono-code">Platform Features</span>
+            <h2 class="fw-extrabold text-white mt-1">Everything Your Workshop Needs</h2>
+            <p class="text-secondary">Designed to replace messy clipboards and disconnected spreadsheets.</p>
+          </div>
+
+          <div class="row g-4">
+            <!-- Feature 1: Digital Job Cards -->
+            <div class="col-md-6 col-lg-3">
+              <div class="wc-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="p-3 rounded-3 bg-danger bg-opacity-20 text-danger d-inline-flex mb-3">
+                    <i class="bi bi-receipt-cutoff fs-4"></i>
+                  </div>
+                  <h4 class="fw-bold text-white fs-5">Digital Job Cards</h4>
+                  <p class="text-secondary small leading-relaxed">
+                    Track vehicle repairs and customer complaints in real-time across workshop bays.
+                  </p>
+                </div>
+                <div class="pt-3 border-top border-secondary border-opacity-25 text-secondary small font-mono-code">
+                  <i class="bi bi-check2 text-danger me-1"></i>Paperless Workflow
+                </div>
+              </div>
+            </div>
+
+            <!-- Feature 2: Inventory Control -->
+            <div class="col-md-6 col-lg-3">
+              <div class="wc-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary d-inline-flex mb-3">
+                    <i class="bi bi-boxes fs-4"></i>
+                  </div>
+                  <h4 class="fw-bold text-white fs-5">Inventory Control</h4>
+                  <p class="text-secondary small leading-relaxed">
+                    Automatic stock-out updates when spare parts and lubricants are allocated to repairs.
+                  </p>
+                </div>
+                <div class="pt-3 border-top border-secondary border-opacity-25 text-secondary small font-mono-code">
+                  <i class="bi bi-check2 text-primary me-1"></i>Real-time Stock Deductions
+                </div>
+              </div>
+            </div>
+
+            <!-- Feature 3: Billing & Invoices -->
+            <div class="col-md-6 col-lg-3">
+              <div class="wc-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="p-3 rounded-3 bg-success bg-opacity-20 text-success d-inline-flex mb-3">
+                    <i class="bi bi-cash-stack fs-4"></i>
+                  </div>
+                  <h4 class="fw-bold text-white fs-5">Billing & Invoices</h4>
+                  <p class="text-secondary small leading-relaxed">
+                    Instant calculation of labor charges and parts costs with formatted thermal receipts.
+                  </p>
+                </div>
+                <div class="pt-3 border-top border-secondary border-opacity-25 text-secondary small font-mono-code">
+                  <i class="bi bi-check2 text-success me-1"></i>Thermal Receipt Generator
+                </div>
+              </div>
+            </div>
+
+            <!-- Feature 4: Service History -->
+            <div class="col-md-6 col-lg-3">
+              <div class="wc-card p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div class="p-3 rounded-3 bg-warning bg-opacity-20 text-warning d-inline-flex mb-3">
+                    <i class="bi bi-clock-history fs-4"></i>
+                  </div>
+                  <h4 class="fw-bold text-white fs-5">Service History</h4>
+                  <p class="text-secondary small leading-relaxed">
+                    Access complete past records and diagnostic logs of any vehicle in seconds.
+                  </p>
+                </div>
+                <div class="pt-3 border-top border-secondary border-opacity-25 text-secondary small font-mono-code">
+                  <i class="bi bi-check2 text-warning me-1"></i>License Plate Indexing
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 2: CONTACT US PAGE (WITH REAL-TIME VALIDATION)     -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-contact" class="app-view py-5">
+      <div class="container py-2">
+        <div class="text-center max-w-2xl mx-auto mb-5">
+          <span class="text-danger fw-bold text-uppercase small font-mono-code">Support & Inquiries</span>
+          <h2 class="fw-extrabold text-white mt-1">Contact WheelsCare</h2>
+          <p class="text-secondary">Have questions regarding workshop onboarding, system setup, or support? Reach out directly.</p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+          <!-- Support Information Card -->
+          <div class="col-lg-5">
+            <div class="wc-card p-4 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <h4 class="fw-bold text-white fs-5 mb-3">Support Information</h4>
+
+                <div class="space-y-3 mb-4">
+                  <!-- Email -->
+                  <div class="d-flex align-items-center gap-3 p-3 wc-card-inner rounded-3 mb-2.5">
+                    <div class="text-danger fs-5"><i class="bi bi-envelope-fill"></i></div>
+                    <div>
+                      <div class="text-white fw-semibold small">Support Email</div>
+                      <a href="mailto:support@wheelscare.com" class="text-secondary font-mono-code small text-decoration-none hover-text-white">
+                        support@wheelscare.com
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Helpline Phone -->
+                  <div class="d-flex align-items-center gap-3 p-3 wc-card-inner rounded-3 mb-2.5">
+                    <div class="text-danger fs-5"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                      <div class="text-white fw-semibold small">Helpline Telephone</div>
+                      <a href="tel:+923000000000" class="text-secondary font-mono-code small text-decoration-none hover-text-white">
+                        +92 (300) 000-0000
+                      </a>
+                    </div>
+                  </div>
+
+                  <!-- Working Hours -->
+                  <div class="d-flex align-items-center gap-3 p-3 wc-card-inner rounded-3">
+                    <div class="text-warning fs-5"><i class="bi bi-clock-fill"></i></div>
+                    <div>
+                      <div class="text-white fw-semibold small">Working Hours</div>
+                      <div class="text-secondary small font-mono-code">Monday – Saturday: 9:00 AM – 6:00 PM</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Customer Care Promise -->
+              <div class="p-3 wc-card-inner rounded-3 border border-secondary border-opacity-50">
+                <div class="d-flex align-items-center gap-2 text-white small fw-semibold mb-1">
+                  <i class="bi bi-shield-check text-success"></i> Customer Care Commitment
+                </div>
+                <div class="text-secondary small">
+                  Inquiries are typically reviewed and answered by our support desk within 2 business hours.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Contact Form with Validation -->
+          <div class="col-lg-7">
+            <div class="wc-card p-4 p-md-5">
+              <h4 class="fw-bold text-white fs-5 mb-1">Send a Message</h4>
+              <p class="text-secondary small mb-4">Complete the form below and our team will get back to you.</p>
+
+              <form id="contact-form" novalidate onsubmit="handleContactSubmit(event)">
+                <div class="row g-3">
+                  <!-- Full Name -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Full Name *</label>
+                    <input type="text" id="contact-name" class="form-control" placeholder="e.g. Usman Malik" />
+                    <div class="invalid-feedback" id="contact-name-error">Full name is required.</div>
+                  </div>
+
+                  <!-- Email Address -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Email Address *</label>
+                    <input type="email" id="contact-email" class="form-control font-mono-code" placeholder="usman@example.com" />
+                    <div class="invalid-feedback" id="contact-email-error">Please provide a valid email address.</div>
+                  </div>
+
+                  <!-- Phone Number (11 digits format check) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Phone Number *</label>
+                    <input type="tel" id="contact-phone" class="form-control font-mono-code" placeholder="03001234567" maxlength="11" />
+                    <div class="invalid-feedback" id="contact-phone-error">Phone number must be 11 numeric digits (e.g., 03001234567).</div>
+                  </div>
+
+                  <!-- Inquiry Subject -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Inquiry Subject *</label>
+                    <input type="text" id="contact-subject" class="form-control" placeholder="e.g. Software Demo Inquiry" />
+                    <div class="invalid-feedback" id="contact-subject-error">Inquiry subject is required.</div>
+                  </div>
+
+                  <!-- Message Box (Min 15 chars) -->
+                  <div class="col-12">
+                    <label class="form-label text-secondary small fw-semibold">Detailed Message *</label>
+                    <textarea id="contact-message" class="form-control" rows="4" placeholder="Detail your operational inquiry or requested assistance (minimum 15 characters)..."></textarea>
+                    <div class="invalid-feedback" id="contact-message-error">Please enter a message of at least 15 characters.</div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger fw-bold px-4 py-2.5 mt-3 shadow-sm">
+                  <i class="bi bi-send me-1"></i> Send Message
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 3: SIGN IN PAGE (WITH REAL-TIME VALIDATION)        -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-login" class="app-view py-5">
+      <div class="container py-2">
+        <div class="row justify-content-center">
+          <div class="col-md-7 col-lg-5">
+            <div class="wc-card p-4 p-md-5 border-secondary border-opacity-50">
+              <div class="text-center mb-4">
+                <div class="p-3 rounded-3 bg-danger bg-opacity-10 text-danger d-inline-flex mb-2">
+                  <i class="bi bi-lock-fill fs-3"></i>
+                </div>
+                <h2 class="fw-extrabold text-white mb-1">Sign In</h2>
+                <p class="text-secondary small">
+                  Select your role and enter your credentials to access the platform.
+                </p>
+              </div>
+
+              <!-- Role Selector -->
+              <div class="mb-4">
+                <label class="form-label text-secondary small fw-semibold font-mono-code mb-1">SELECT ROLE:</label>
+                <div class="d-flex gap-2 p-1 wc-card-inner rounded-3 border border-secondary border-opacity-50">
+                  <button type="button" id="role-btn-owner" onclick="setLoginRole('owner')" class="btn btn-danger w-50 fw-semibold btn-sm py-2">
+                    <i class="bi bi-building me-1"></i>Workshop Owner
+                  </button>
+                  <button type="button" id="role-btn-admin" onclick="setLoginRole('admin')" class="btn btn-outline-secondary w-50 fw-semibold btn-sm py-2">
+                    <i class="bi bi-shield-lock me-1"></i>Super Admin
+                  </button>
+                </div>
+              </div>
+
+              <!-- Login Form with Validation -->
+              <form id="login-form" novalidate onsubmit="handleLoginSubmit(event)">
+                <!-- Email Field -->
+                <div class="mb-3">
+                  <label class="form-label text-secondary small fw-semibold">Email Address *</label>
+                  <input type="email" id="login-email" class="form-control font-mono-code" placeholder="e.g. user@example.com" />
+                  <div class="invalid-feedback" id="login-email-error">Please provide a valid registered email address.</div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-3">
+                  <label class="form-label text-secondary small fw-semibold">Password *</label>
+                  <div class="input-group has-validation">
+                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordEye('login-password', this)" tabindex="-1">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <div class="invalid-feedback" id="login-password-error">Password is required.</div>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 fw-bold py-2.5 shadow-sm mt-2">
+                  Sign In
+                </button>
+              </form>
+
+              <div class="text-center mt-4 small text-secondary">
+                Need to register your auto-workshop? 
+                <a href="javascript:void(0)" onclick="navigateTo('register')" class="text-danger fw-semibold text-decoration-none ms-1">
+                  Register Workshop
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 4: REGISTRATION PAGE (WITH REAL-TIME VALIDATION)   -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-register" class="app-view py-5">
+      <div class="container py-2">
+        <div class="row justify-content-center">
+          <div class="col-lg-7 col-xl-6">
+            <div class="wc-card p-4 p-md-5 border-secondary border-opacity-50">
+              <div class="text-center mb-4">
+                <div class="p-3 rounded-3 bg-danger bg-opacity-10 text-danger d-inline-flex mb-2">
+                  <i class="bi bi-building-add fs-3"></i>
+                </div>
+                <h2 class="fw-extrabold text-white mb-1">Register Workshop</h2>
+                <p class="text-secondary small">
+                  Submit your facility details to apply for a WheelsCare commercial license.
+                </p>
+              </div>
+
+              <form id="register-form" novalidate onsubmit="handleRegistrationSubmit(event)">
+                <div class="row g-3">
+                  <!-- Workshop Name (Min 3 chars) -->
+                  <div class="col-12">
+                    <label class="form-label text-secondary small fw-semibold">Workshop Name *</label>
+                    <input type="text" id="reg-name" class="form-control" placeholder="e.g. Apex Performance & Diagnostics" />
+                    <div class="invalid-feedback" id="reg-name-error">Workshop name is required (minimum 3 characters).</div>
+                  </div>
+
+                  <!-- Owner Full Name (Alphabets only) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Owner Full Name *</label>
+                    <input type="text" id="reg-owner" class="form-control" placeholder="e.g. Alexander Sterling" />
+                    <div class="invalid-feedback" id="reg-owner-error">Owner name is required and must contain alphabets only.</div>
+                  </div>
+
+                  <!-- City / Location -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">City / Location *</label>
+                    <input type="text" id="reg-city" class="form-control" placeholder="e.g. Islamabad" />
+                    <div class="invalid-feedback" id="reg-city-error">City / Location is required.</div>
+                  </div>
+
+                  <!-- Official Email (Pattern check) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Official Email Address *</label>
+                    <input type="email" id="reg-email" class="form-control font-mono-code" placeholder="info@workshop.com" />
+                    <div class="invalid-feedback" id="reg-email-error">Invalid email format (e.g., info@workshop.com).</div>
+                  </div>
+
+                  <!-- Phone Number (Exactly 11 digits) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Phone Number *</label>
+                    <input type="tel" id="reg-phone" class="form-control font-mono-code" placeholder="03001234567" maxlength="11" />
+                    <div class="invalid-feedback" id="reg-phone-error">Phone number must be 11 numeric digits.</div>
+                  </div>
+
+                  <!-- Password (Min 8 chars) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Account Password *</label>
+                    <div class="input-group has-validation">
+                      <input type="password" id="reg-password" class="form-control" placeholder="At least 8 characters" />
+                      <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordEye('reg-password', this)" tabindex="-1">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <div class="invalid-feedback" id="reg-password-error">Password must be at least 8 characters long.</div>
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password (Must match) -->
+                  <div class="col-md-6">
+                    <label class="form-label text-secondary small fw-semibold">Confirm Password *</label>
+                    <div class="input-group has-validation">
+                      <input type="password" id="reg-confirm-password" class="form-control" placeholder="Re-enter password" />
+                      <button type="button" class="btn btn-outline-secondary" onclick="togglePasswordEye('reg-confirm-password', this)" tabindex="-1">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <div class="invalid-feedback" id="reg-confirm-error">Passwords do not match.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="p-3 wc-card-inner rounded-3 my-3 small text-secondary">
+                  <div class="fw-semibold text-white mb-1"><i class="bi bi-shield-lock-fill text-warning me-1"></i>Approval Notice:</div>
+                  All newly registered workshop accounts undergo Super Admin verification. You will be redirected to the home page with a pending notice while your license is authorized.
+                </div>
+
+                <button type="submit" class="btn btn-danger w-100 fw-bold py-2.5 shadow-sm mt-2">
+                  Submit Workshop Application
+                </button>
+              </form>
+
+              <div class="text-center mt-4 small text-secondary">
+                Already registered? 
+                <a href="javascript:void(0)" onclick="navigateTo('login')" class="text-danger fw-semibold text-decoration-none ms-1">
+                  Sign In
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 5: WORKSHOP PORTAL (Unlocked upon approval)        -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-workspace" class="app-view py-4">
+      <div class="container py-2">
+        <!-- Portal Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <div class="d-inline-flex align-items-center gap-2 px-2.5 py-0.5 rounded bg-success bg-opacity-10 border border-success border-opacity-30 text-success font-mono-code small mb-1">
+              <i class="bi bi-check-circle-fill"></i> AUTHORIZED COMMERCIAL WORKSPACE
+            </div>
+            <h2 class="fw-extrabold text-white mb-0" id="portal-workshop-name">
+              Al-Madina Precision Auto Care
+            </h2>
+            <small class="text-secondary" id="portal-workshop-meta">
+              Facility ID: #WC-101 · Owner: Haji Muhammad Aslam · Location: Islamabad
+            </small>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button onclick="quickFillCar()" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-magic me-1"></i> Fill Test Car
+            </button>
+            <button onclick="navigateTo('home')" class="btn btn-sm btn-outline-light">
+              <i class="bi bi-house me-1"></i> Home
+            </button>
+          </div>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-lg-3">
+            <div class="wc-card p-3 d-flex align-items-center gap-3">
+              <div class="p-3 rounded-3 bg-danger bg-opacity-20 text-danger fs-4">
+                <i class="bi bi-car-front-fill"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold text-white font-mono-code" id="metric-total-jobs">0</div>
+                <div class="text-secondary small font-mono-code" style="font-size: 0.72rem;">TOTAL LOGGED</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="wc-card p-3 d-flex align-items-center gap-3">
+              <div class="p-3 rounded-3 bg-warning bg-opacity-20 text-warning fs-4">
+                <i class="bi bi-hourglass-split"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold text-white font-mono-code" id="metric-active-jobs">0</div>
+                <div class="text-secondary small font-mono-code" style="font-size: 0.72rem;">ACTIVE IN BAY</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="wc-card p-3 d-flex align-items-center gap-3">
+              <div class="p-3 rounded-3 bg-success bg-opacity-20 text-success fs-4">
+                <i class="bi bi-check-all"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold text-white font-mono-code" id="metric-done-jobs">0</div>
+                <div class="text-secondary small font-mono-code" style="font-size: 0.72rem;">COMPLETED</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-6 col-lg-3">
+            <div class="wc-card p-3 d-flex align-items-center gap-3">
+              <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary fs-4">
+                <i class="bi bi-cash-stack"></i>
+              </div>
+              <div>
+                <div class="fs-4 fw-bold text-white font-mono-code" id="metric-revenue">Rs. 0</div>
+                <div class="text-secondary small font-mono-code" style="font-size: 0.72rem;">ESTIMATED INVOICED</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vehicle Intake Form Card -->
+        <div class="wc-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+              <i class="bi bi-plus-square-fill text-danger"></i> Counter Vehicle Intake (New Digital Job Card)
+            </h5>
+            <span class="badge bg-secondary font-mono-code">COUNTER POS</span>
+          </div>
+
+          <form id="intake-form" onsubmit="handleJobCardSubmit(event)">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Customer Full Name *</label>
+                <input type="text" id="intake-name" class="form-control" placeholder="e.g. Tariq Mehmood" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Phone Number *</label>
+                <input type="tel" id="intake-phone" class="form-control font-mono-code" placeholder="03009876543" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Car Model *</label>
+                <input type="text" id="intake-car" class="form-control" placeholder="e.g. Toyota Corolla GLi" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Plate / Reg Number *</label>
+                <input type="text" id="intake-plate" class="form-control font-mono-code text-uppercase" placeholder="e.g. LEA-7890" required />
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-secondary small fw-semibold">Reported Mechanical Issue / Fault Description *</label>
+                <input type="text" id="intake-fault" class="form-control" placeholder="e.g. Engine knocking sound, oil leak underneath, brake squeal" required />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Assigned Service Bay</label>
+                <select id="intake-bay" class="form-select font-mono-code">
+                  <option value="Bay #1 (Diagnostic Dyno)">Bay #1 (Diagnostic Dyno)</option>
+                  <option value="Bay #2 (Suspension & Brakes)">Bay #2 (Suspension & Brakes)</option>
+                  <option value="Bay #3 (Express Lubrication)">Bay #3 (Express Lubrication)</option>
+                  <option value="Bay #4 (Transmission Cell)">Bay #4 (Transmission Cell)</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label text-secondary small fw-semibold">Estimated Amount (PKR)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-dark text-secondary border-secondary">Rs.</span>
+                  <input type="number" id="intake-amount" class="form-control font-mono-code" value="3500" required />
+                </div>
+              </div>
+
+              <div class="col-12 text-end">
+                <button type="submit" class="btn btn-danger fw-bold px-4 shadow-sm">
+                  <i class="bi bi-file-earmark-plus me-1"></i> Create Digital Job Card
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Live Job Cards Table Card -->
+        <div class="wc-card p-4 mb-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+              <i class="bi bi-table text-danger"></i> Active Workshop Job Cards
+            </h5>
+            <input type="text" id="job-search" onkeyup="renderJobCardsTable()" class="form-control form-control-sm font-mono-code" placeholder="Filter plate or customer..." style="max-width: 220px;" />
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-dark-custom table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Vehicle & Plate</th>
+                  <th>Customer Contact</th>
+                  <th>Assigned Bay</th>
+                  <th>Fault Description</th>
+                  <th>Est. Fee</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="job-cards-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="no-jobs-msg" class="text-center py-4 text-secondary d-none">
+            <i class="bi bi-inbox fs-3 d-block mb-1"></i>
+            No job cards logged. Use the intake form above to add a vehicle!
+          </div>
+        </div>
+
+        <!-- Spare Parts Inventory Preview -->
+        <div class="wc-card p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+              <i class="bi bi-boxes text-primary"></i> Spare-Parts Inventory (Real-Time Stock)
+            </h5>
+            <span class="badge bg-primary bg-opacity-25 text-info font-mono-code">OEM WAREHOUSE</span>
+          </div>
+
+          <div class="row g-3" id="inventory-grid">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------------- -->
+    <!-- VIEW 6: SUPER ADMIN GOVERNANCE CONSOLE                  -->
+    <!-- ------------------------------------------------------- -->
+    <div id="view-admin" class="app-view py-4">
+      <div class="container py-2">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+          <div>
+            <div class="d-inline-flex align-items-center gap-2 px-2.5 py-0.5 rounded bg-primary bg-opacity-15 border border-primary border-opacity-30 text-info font-mono-code small mb-1">
+              <i class="bi bi-shield-lock-fill"></i> CENTRAL VENDOR GOVERNANCE CONSOLE
+            </div>
+            <h2 class="fw-extrabold text-white mb-0">Super Administrator Dashboard</h2>
+            <small class="text-secondary">License verification, real-time approval queue, and facility management</small>
+          </div>
+
+          <button onclick="navigateTo('home')" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-house me-1"></i> Public Home Page
+          </button>
+        </div>
+
+        <!-- 1. PENDING APPROVAL QUEUE -->
+        <div class="wc-card p-4 mb-4 border-warning border-opacity-50">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+            <div>
+              <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-hourglass-top text-warning"></i> Pending Workshop License Requests
+              </h5>
+              <small class="text-secondary">Newly registered commercial repair centers awaiting Super Admin authorization.</small>
+            </div>
+            <span id="admin-pending-badge" class="badge bg-warning text-dark font-mono-code fw-bold">0 PENDING</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-dark-custom table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Workshop Name</th>
+                  <th>Owner</th>
+                  <th>Official Email & Phone</th>
+                  <th>City / Location</th>
+                  <th>Submitted</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-pending-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+
+          <div id="admin-no-pending-msg" class="text-center py-4 text-secondary d-none">
+            <i class="bi bi-check-circle text-success fs-3 d-block mb-1"></i>
+            No pending workshop applications awaiting approval.
+          </div>
+        </div>
+
+        <!-- 2. ALL REGISTERED WORKSHOPS & SUSPENSION CONTROL -->
+        <div class="wc-card p-4 mb-4">
+          <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+            <div>
+              <h5 class="fw-bold text-white mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-buildings text-info"></i> All Registered Auto-Workshops
+              </h5>
+              <small class="text-secondary">Control commercial active licenses, monthly subscription suspensions, and reactivations.</small>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-dark-custom table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Workshop Facility</th>
+                  <th>Owner</th>
+                  <th>Official Email</th>
+                  <th>Location</th>
+                  <th>Monthly Fee</th>
+                  <th>Current Status</th>
+                  <th class="text-end">License Controls</th>
+                </tr>
+              </thead>
+              <tbody id="admin-all-workshops-tbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. AUDIT & EVENT LOGS -->
+        <div class="wc-card p-4">
+          <h5 class="fw-bold text-white mb-2 d-flex align-items-center gap-2">
+            <i class="bi bi-journal-code text-secondary"></i> System Governance Audit Logs
+          </h5>
+          <p class="text-secondary small mb-3">Immutable record of registrations, approvals, and security actions:</p>
+
+          <div class="p-3 wc-card-inner rounded-3 font-mono-code small overflow-auto" style="max-height: 250px;" id="admin-logs-box">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- CLEAN CORPORATE FOOTER                                    -->
+  <!-- ========================================================= -->
+  <footer class="bg-black bg-opacity-70 border-top border-secondary border-opacity-25 text-secondary mt-auto py-4">
+    <div class="container max-w-7xl">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-6 text-center text-md-start">
+          <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+            <span class="p-1 rounded bg-danger text-white"><i class="bi bi-wrench"></i></span>
+            <span class="fw-bold text-white fs-6">WheelsCare</span>
+            <span class="text-secondary small">· Automotive Workshop Platform</span>
+          </div>
+          <div class="small text-muted">
+            Support: <a href="mailto:support@wheelscare.com" class="text-secondary text-decoration-none">support@wheelscare.com</a> · Helpline: +92 (300) 000-0000
+          </div>
+        </div>
+
+        <div class="col-md-6 text-center text-md-end small font-mono-code text-muted">
+          <div class="d-flex justify-content-center justify-md-end gap-3 mb-1">
+            <a href="javascript:void(0)" onclick="navigateTo('home')" class="text-muted text-decoration-none hover-text-white">Home</a>
+            <span>·</span>
+            <a href="javascript:void(0)" onclick="scrollToFeatures()" class="text-muted text-decoration-none hover-text-white">Features</a>
+            <span>·</span>
+            <a href="javascript:void(0)" onclick="navigateTo('contact')" class="text-muted text-decoration-none hover-text-white">Contact</a>
+            <span>·</span>
+            <a href="javascript:void(0)" onclick="alert('WheelsCare Privacy Policy: All workshop data and customer records are securely stored.')" class="text-muted text-decoration-none hover-text-white">Privacy Policy</a>
+          </div>
+          <div>© 2026 WheelsCare Technologies Ltd. All Rights Reserved.</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODALS                                                    -->
+  <!-- ========================================================= -->
+
+  <!-- ACCESS PENDING WARNING MODAL -->
+  <div class="modal fade" id="pendingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content wc-card border-warning text-white">
+        <div class="modal-header border-secondary border-opacity-50">
+          <h5 class="modal-title fw-bold text-warning d-flex align-items-center gap-2">
+            <i class="bi bi-hourglass-split"></i> Account Pending Verification
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4 text-center">
+          <div class="display-4 text-warning mb-3">
+            <i class="bi bi-shield-exclamation"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">Awaiting Super Admin Approval</h4>
+          <p class="text-secondary small leading-relaxed mb-4">
+            Your commercial license application for <strong id="pending-shop-title" class="text-white">Workshop</strong> is currently under review by WheelsCare administrators. Workshop features will be unlocked once approved.
+          </p>
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+            Acknowledge & Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOB CARD PRINT RECEIPT SLIP MODAL -->
+  <div class="modal fade" id="jobSlipModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content wc-card border-secondary text-white">
+        <div class="modal-header border-secondary border-opacity-50">
+          <h5 class="modal-title fw-bold">
+            <i class="bi bi-receipt-cutoff text-danger me-2"></i>Job Card Intake Receipt
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="print-modal-content">
+          <div class="text-center pb-3 border-bottom border-secondary mb-3">
+            <h4 class="fw-extrabold text-danger mb-0" id="slip-shop-name">Al-Madina Precision Auto Care</h4>
+            <small class="text-secondary">WheelsCare Authorized Service Bay</small>
+            <div class="font-mono-code small mt-1">Helpline: +92 (300) 000-0000 · support@wheelscare.com</div>
+          </div>
+
+          <div id="slip-details-container" class="font-mono-code small space-y-2">
+            <!-- Dynamically populated -->
+          </div>
+
+          <div class="p-2 bg-dark rounded border border-secondary text-center small text-secondary mt-3">
+            Please retain this receipt for vehicle handover. Thank you for choosing us!
+          </div>
+        </div>
+        <div class="modal-footer border-secondary border-opacity-50">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" onclick="window.print()" class="btn btn-danger btn-sm">
+            <i class="bi bi-printer me-1"></i> Print Thermal Receipt
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3 JS Bundle CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT STATE MANAGEMENT & VALIDATION ENGINE           -->
+  <!-- ========================================================= -->
+  <script>
+    const STORAGE_KEY_WORKSHOPS = 'wc_saas_workshops_v4';
+    const STORAGE_KEY_JOBS = 'wc_saas_jobs_v4';
+    const STORAGE_KEY_SESSION = 'wc_saas_session_v4';
+    const STORAGE_KEY_LOGS = 'wc_saas_logs_v4';
+
+    const INITIAL_WORKSHOPS = [
+      {
+        id: 'WC-101',
+        name: 'Al-Madina Precision Auto Care',
+        owner: 'Haji Muhammad Aslam',
+        email: 'aslam@almadina.com',
+        phone: '03001234567',
+        city: 'Islamabad',
+        password: 'password123',
+        status: 'Approved',
+        fee: 3500,
+        appliedDate: '10-Oct-2026'
+      },
+      {
+        id: 'WC-102',
+        name: 'Apex Master Performance Center',
+        owner: 'Alexander Sterling',
+        email: 'sterling@apexmotors.com',
+        phone: '03219876543',
+        city: 'Lahore',
+        password: 'password123',
+        status: 'Pending',
+        fee: 3500,
+        appliedDate: '12-Oct-2026'
+      }
+    ];
+
+    const INITIAL_JOBS = [
+      {
+        id: 'JOB-901',
+        workshopId: 'WC-101',
+        customer: 'Richard Thornton',
+        phone: '03005544332',
+        car: 'Ford Mustang GT 5.0 (2020)',
+        plate: 'ISB-552-MK',
+        fault: 'Brake disc replacement and Brembo slotted caliper overhaul',
+        bay: 'Bay #2 (Suspension & Brakes)',
+        cost: 6500,
+        status: 'Completed',
+        timestamp: 'Today, 09:15 AM'
+      },
+      {
+        id: 'JOB-902',
+        workshopId: 'WC-101',
+        customer: 'Elena Rostova',
+        phone: '03331122334',
+        car: 'BMW 330i M-Sport (2021)',
+        plate: 'LEA-789-GT',
+        fault: 'Full synthetic Motul 5W-30 oil service & 21-point safety inspection',
+        bay: 'Bay #3 (Express Lubrication)',
+        cost: 4200,
+        status: 'In Bay',
+        timestamp: 'Today, 10:45 AM'
+      },
+      {
+        id: 'JOB-903',
+        workshopId: 'WC-101',
+        customer: 'Tariq Mehmood',
+        phone: '03214455667',
+        car: 'Toyota Corolla GLi 1.3',
+        plate: 'FD-4821',
+        fault: 'OBD-II throttle body calibration & spark ignition timing',
+        bay: 'Bay #1 (Diagnostic Dyno)',
+        cost: 2800,
+        status: 'In Bay',
+        timestamp: 'Today, 11:30 AM'
+      }
+    ];
+
+    const INVENTORY_PARTS = [
+      { name: 'Motul 8100 5W-30 Full Synthetic Oil', sku: 'LUB-8100-5W30', stock: 48, min: 15, unit: 'Liters', price: 2800 },
+      { name: 'Brembo Front Slotted Rotors (Pair)', sku: 'BRK-BRM-380', stock: 8, min: 4, unit: 'Pairs', price: 18500 },
+      { name: 'Brembo Ceramic Low-Dust Brake Pads', sku: 'PAD-BRM-CER', stock: 14, min: 6, unit: 'Sets', price: 6200 },
+      { name: 'NGK Laser Iridium Spark Plugs', sku: 'IGN-NGK-IRID', stock: 64, min: 20, unit: 'Units', price: 1200 },
+      { name: 'Mann-Filter HU816x High-Flow Cartridge', sku: 'FLT-MNN-816', stock: 22, min: 10, unit: 'Units', price: 1800 },
+      { name: 'Denso Cabin Charcoal Air Filter', sku: 'FLT-DNS-CAB', stock: 19, min: 8, unit: 'Units', price: 2100 }
+    ];
+
+    let state = {
+      workshops: [],
+      jobs: [],
+      auditLogs: [],
+      currentUser: null,
+      currentView: 'home',
+      loginSelectedRole: 'owner'
+    };
+
+    function loadState() {
+      try {
+        const storedWorkshops = localStorage.getItem(STORAGE_KEY_WORKSHOPS);
+        state.workshops = storedWorkshops ? JSON.parse(storedWorkshops) : INITIAL_WORKSHOPS;
+
+        const storedJobs = localStorage.getItem(STORAGE_KEY_JOBS);
+        state.jobs = storedJobs ? JSON.parse(storedJobs) : INITIAL_JOBS;
+
+        const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
+        state.auditLogs = storedLogs ? JSON.parse(storedLogs) : [
+          { time: 'System Initialization', text: 'WheelsCare Enterprise Auto-Workshop suite operational.' }
+        ];
+
+        const storedSession = localStorage.getItem(STORAGE_KEY_SESSION);
+        state.currentUser = storedSession ? JSON.parse(storedSession) : null;
+      } catch (e) {
+        state.workshops = INITIAL_WORKSHOPS;
+        state.jobs = INITIAL_JOBS;
+        state.auditLogs = [];
+        state.currentUser = null;
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY_WORKSHOPS, JSON.stringify(state.workshops));
+        localStorage.setItem(STORAGE_KEY_JOBS, JSON.stringify(state.jobs));
+        localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(state.auditLogs));
+        if (state.currentUser) {
+          localStorage.setItem(STORAGE_KEY_SESSION, JSON.stringify(state.currentUser));
+        } else {
+          localStorage.removeItem(STORAGE_KEY_SESSION);
+        }
+      } catch (e) {
+        console.error('Save state error:', e);
+      }
+    }
+
+    function addAuditLog(text) {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      state.auditLogs.unshift({ time: timeStr, text });
+      if (state.auditLogs.length > 40) state.auditLogs.pop();
+      saveState();
+      renderAuditLogs();
+    }
+
+    // -------------------------------------------------------------
+    // NAVIGATION
+    // -------------------------------------------------------------
+    function navigateTo(viewId) {
+      state.currentView = viewId;
+
+      document.querySelectorAll('.nav-link-item').forEach(el => el.classList.remove('active'));
+      const activeNav = document.getElementById(`nav-${viewId}`);
+      if (activeNav) activeNav.classList.add('active');
+
+      document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active-view'));
+      const activeView = document.getElementById(`view-${viewId}`);
+      if (activeView) activeView.classList.add('active-view');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (viewId === 'workspace') {
+        renderWorkspace();
+      } else if (viewId === 'admin') {
+        renderAdmin();
+      }
+    }
+
+    function scrollToFeatures() {
+      if (state.currentView !== 'home') {
+        navigateTo('home');
+        setTimeout(() => {
+          const el = document.getElementById('features-section');
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else {
+        const el = document.getElementById('features-section');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      document.querySelectorAll('.nav-link-item').forEach(el => el.classList.remove('active'));
+      const featNav = document.getElementById('nav-features');
+      if (featNav) featNav.classList.add('active');
+    }
+
+    function updateNavAuthState() {
+      const guestActions = document.getElementById('auth-actions-guest');
+      const userActions = document.getElementById('auth-actions-user');
+      const userName = document.getElementById('user-display-name');
+      const userBadge = document.getElementById('user-display-badge');
+      const wsLink = document.getElementById('nav-workspace-link');
+      const adminLink = document.getElementById('nav-admin-link');
+
+      if (!state.currentUser) {
+        guestActions.classList.remove('d-none');
+        userActions.classList.add('d-none');
+        wsLink.classList.add('d-none');
+        adminLink.classList.add('d-none');
+      } else if (state.currentUser.role === 'admin') {
+        guestActions.classList.add('d-none');
+        userActions.classList.remove('d-none');
+        userName.textContent = state.currentUser.name;
+        userBadge.className = 'badge bg-primary font-mono-code';
+        userBadge.textContent = 'SUPER ADMIN';
+        adminLink.classList.remove('d-none');
+        wsLink.classList.add('d-none');
+      } else {
+        guestActions.classList.add('d-none');
+        userActions.classList.remove('d-none');
+        userName.textContent = state.currentUser.name;
+        userBadge.className = 'badge bg-danger font-mono-code';
+        userBadge.textContent = 'OWNER';
+        wsLink.classList.remove('d-none');
+        adminLink.classList.add('d-none');
+      }
+    }
+
+    function handleLogout() {
+      state.currentUser = null;
+      saveState();
+      updateNavAuthState();
+      navigateTo('home');
+    }
+
+    function dismissNotificationBanner() {
+      document.getElementById('status-notification-banner').classList.add('d-none');
+    }
+
+    function togglePasswordEye(fieldId, btn) {
+      const field = document.getElementById(fieldId);
+      if (field.type === 'password') {
+        field.type = 'text';
+        btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+      } else {
+        field.type = 'password';
+        btn.innerHTML = '<i class="bi bi-eye"></i>';
+      }
+    }
+
+    function setLoginRole(role) {
+      state.loginSelectedRole = role;
+      const ownerBtn = document.getElementById('role-btn-owner');
+      const adminBtn = document.getElementById('role-btn-admin');
+
+      if (role === 'owner') {
+        ownerBtn.className = 'btn btn-danger w-50 fw-semibold btn-sm py-2';
+        adminBtn.className = 'btn btn-outline-secondary w-50 fw-semibold btn-sm py-2';
+      } else {
+        adminBtn.className = 'btn btn-primary w-50 fw-semibold btn-sm py-2';
+        ownerBtn.className = 'btn btn-outline-secondary w-50 fw-semibold btn-sm py-2';
+      }
+    }
+
+    // =============================================================
+    // VALIDATION HELPER FUNCTIONS
+    // =============================================================
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const ALPHABET_REGEX = /^[A-Za-z\s]+$/;
+    const PHONE_11_REGEX = /^\d{11}$/;
+
+    function setFieldValid(inputEl, errorEl) {
+      inputEl.classList.remove('is-invalid');
+      inputEl.classList.add('is-valid');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
+    function setFieldInvalid(inputEl, errorEl, message) {
+      inputEl.classList.remove('is-valid');
+      inputEl.classList.add('is-invalid');
+      if (errorEl) {
+        if (message) errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      }
+    }
+
+    function clearFieldValidation(inputEl, errorEl) {
+      inputEl.classList.remove('is-valid', 'is-invalid');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
+    // -------------------------------------------------------------
+    // FORM 1: SIGN IN (LOGIN) VALIDATION
+    // -------------------------------------------------------------
+    function validateLoginEmail(showFeedback = true) {
+      const input = document.getElementById('login-email');
+      const error = document.getElementById('login-email-error');
+      const val = input.value.trim();
+
+      if (!val || !EMAIL_REGEX.test(val)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Please provide a valid registered email address.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateLoginPassword(showFeedback = true) {
+      const input = document.getElementById('login-password');
+      const error = document.getElementById('login-password-error');
+      const val = input.value;
+
+      if (!val) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Password is required.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+
+      const isEmailValid = validateLoginEmail(true);
+      const isPassValid = validateLoginPassword(true);
+
+      if (!isEmailValid || !isPassValid) {
+        if (!isEmailValid) document.getElementById('login-email').focus();
+        else document.getElementById('login-password').focus();
+        return;
+      }
+
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+
+      if (state.loginSelectedRole === 'admin') {
+        if (email === 'admin@wheelscare.com' || email.includes('admin')) {
+          state.currentUser = {
+            role: 'admin',
+            name: 'Super Administrator',
+            email: email
+          };
+          saveState();
+          addAuditLog('Super Administrator logged in.');
+          updateNavAuthState();
+          navigateTo('admin');
+        } else {
+          setFieldInvalid(document.getElementById('login-email'), document.getElementById('login-email-error'), 'Invalid Super Admin credentials. (Use: admin@wheelscare.com)');
+          document.getElementById('login-email').focus();
+        }
+      } else {
+        const shop = state.workshops.find(w => w.email.toLowerCase() === email);
+        if (!shop) {
+          setFieldInvalid(document.getElementById('login-email'), document.getElementById('login-email-error'), 'No workshop registered with this email address.');
+          document.getElementById('login-email').focus();
+          return;
+        }
+
+        if (shop.status === 'Pending') {
+          document.getElementById('pending-shop-title').textContent = shop.name;
+          const modal = new bootstrap.Modal(document.getElementById('pendingModal'));
+          modal.show();
+          return;
+        }
+
+        if (shop.status === 'Suspended') {
+          alert(`Access Restricted: The license for ${shop.name} is currently suspended due to pending monthly subscription.`);
+          return;
+        }
+
+        state.currentUser = {
+          role: 'owner',
+          workshopId: shop.id,
+          name: shop.owner,
+          email: shop.email
+        };
+        saveState();
+        addAuditLog(`Workshop Owner logged in: ${shop.owner} (${shop.name})`);
+        updateNavAuthState();
+        navigateTo('workspace');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // FORM 2: REGISTRATION (SIGN UP) VALIDATION
+    // -------------------------------------------------------------
+    function validateRegWorkshopName(showFeedback = true) {
+      const input = document.getElementById('reg-name');
+      const error = document.getElementById('reg-name-error');
+      const val = input.value.trim();
+
+      if (!val || val.length < 3) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Workshop name is required and must be at least 3 characters.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegOwnerName(showFeedback = true) {
+      const input = document.getElementById('reg-owner');
+      const error = document.getElementById('reg-owner-error');
+      const val = input.value.trim();
+
+      if (!val || val.length < 2 || !ALPHABET_REGEX.test(val)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Owner name is required and must contain alphabets only.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegCity(showFeedback = true) {
+      const input = document.getElementById('reg-city');
+      const error = document.getElementById('reg-city-error');
+      const val = input.value.trim();
+
+      if (!val) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'City / Location is required.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegEmail(showFeedback = true) {
+      const input = document.getElementById('reg-email');
+      const error = document.getElementById('reg-email-error');
+      const val = input.value.trim();
+
+      if (!val || !EMAIL_REGEX.test(val)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Invalid email format (e.g., info@workshop.com).');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegPhone(showFeedback = true) {
+      const input = document.getElementById('reg-phone');
+      const error = document.getElementById('reg-phone-error');
+      const cleanVal = input.value.trim().replace(/[\s-]/g, '');
+
+      if (!cleanVal || !PHONE_11_REGEX.test(cleanVal)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Phone number must be 11 numeric digits.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegPassword(showFeedback = true) {
+      const input = document.getElementById('reg-password');
+      const error = document.getElementById('reg-password-error');
+      const val = input.value;
+
+      if (!val || val.length < 8) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Password must be at least 8 characters long.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateRegConfirmPassword(showFeedback = true) {
+      const passInput = document.getElementById('reg-password');
+      const confirmInput = document.getElementById('reg-confirm-password');
+      const error = document.getElementById('reg-confirm-error');
+      const passVal = passInput.value;
+      const confirmVal = confirmInput.value;
+
+      if (!confirmVal || confirmVal !== passVal) {
+        if (showFeedback) {
+          setFieldInvalid(confirmInput, error, 'Passwords do not match.');
+        }
+        return false;
+      }
+      setFieldValid(confirmInput, error);
+      return true;
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+
+      const v1 = validateRegWorkshopName(true);
+      const v2 = validateRegOwnerName(true);
+      const v3 = validateRegCity(true);
+      const v4 = validateRegEmail(true);
+      const v5 = validateRegPhone(true);
+      const v6 = validateRegPassword(true);
+      const v7 = validateRegConfirmPassword(true);
+
+      if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6 || !v7) {
+        const firstInvalid = document.querySelector('#register-form .is-invalid');
+        if (firstInvalid) firstInvalid.focus();
+        return;
+      }
+
+      const name = document.getElementById('reg-name').value.trim();
+      const owner = document.getElementById('reg-owner').value.trim();
+      const city = document.getElementById('reg-city').value.trim();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const phone = document.getElementById('reg-phone').value.trim().replace(/[\s-]/g, '');
+      const password = document.getElementById('reg-password').value;
+
+      if (state.workshops.some(w => w.email.toLowerCase() === email)) {
+        setFieldInvalid(document.getElementById('reg-email'), document.getElementById('reg-email-error'), 'A workshop with this email address already exists.');
+        document.getElementById('reg-email').focus();
+        return;
+      }
+
+      const newId = 'WC-' + Math.floor(103 + Math.random() * 890);
+      const newWorkshop = {
+        id: newId,
+        name: name,
+        owner: owner,
+        email: email,
+        phone: phone,
+        city: city,
+        password: password,
+        status: 'Pending',
+        fee: 3500,
+        appliedDate: 'Just Now'
+      };
+
+      state.workshops.unshift(newWorkshop);
+      saveState();
+      addAuditLog(`New workshop registration submitted: ${name} (${owner}) - Status: Pending Approval.`);
+
+      // Reset form and clear validation classes
+      document.getElementById('register-form').reset();
+      document.querySelectorAll('#register-form .form-control').forEach(el => el.classList.remove('is-valid', 'is-invalid'));
+
+      const banner = document.getElementById('status-notification-banner');
+      document.getElementById('banner-title').textContent = 'Registration Submitted: Pending Admin Approval.';
+      document.getElementById('banner-message').textContent = `Your workshop "${name}" application is being processed by the Super Admin.`;
+      banner.classList.remove('d-none');
+
+      navigateTo('home');
+    }
+
+    // -------------------------------------------------------------
+    // FORM 3: CONTACT US VALIDATION
+    // -------------------------------------------------------------
+    function validateContactName(showFeedback = true) {
+      const input = document.getElementById('contact-name');
+      const error = document.getElementById('contact-name-error');
+      const val = input.value.trim();
+
+      if (!val || val.length < 2) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Full name is required.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateContactEmail(showFeedback = true) {
+      const input = document.getElementById('contact-email');
+      const error = document.getElementById('contact-email-error');
+      const val = input.value.trim();
+
+      if (!val || !EMAIL_REGEX.test(val)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Please provide a valid email address.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateContactPhone(showFeedback = true) {
+      const input = document.getElementById('contact-phone');
+      const error = document.getElementById('contact-phone-error');
+      const cleanVal = input.value.trim().replace(/[\s-]/g, '');
+
+      if (!cleanVal || !PHONE_11_REGEX.test(cleanVal)) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Phone number must be 11 numeric digits (e.g., 03001234567).');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateContactSubject(showFeedback = true) {
+      const input = document.getElementById('contact-subject');
+      const error = document.getElementById('contact-subject-error');
+      const val = input.value.trim();
+
+      if (!val) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Inquiry subject is required.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function validateContactMessage(showFeedback = true) {
+      const input = document.getElementById('contact-message');
+      const error = document.getElementById('contact-message-error');
+      const val = input.value.trim();
+
+      if (!val || val.length < 15) {
+        if (showFeedback) {
+          setFieldInvalid(input, error, 'Please enter a message of at least 15 characters.');
+        }
+        return false;
+      }
+      setFieldValid(input, error);
+      return true;
+    }
+
+    function handleContactSubmit(e) {
+      e.preventDefault();
+
+      const v1 = validateContactName(true);
+      const v2 = validateContactEmail(true);
+      const v3 = validateContactPhone(true);
+      const v4 = validateContactSubject(true);
+      const v5 = validateContactMessage(true);
+
+      if (!v1 || !v2 || !v3 || !v4 || !v5) {
+        const firstInvalid = document.querySelector('#contact-form .is-invalid');
+        if (firstInvalid) firstInvalid.focus();
+        return;
+      }
+
+      const name = document.getElementById('contact-name').value.trim();
+      const subject = document.getElementById('contact-subject').value.trim();
+
+      alert(`Thank you, ${name}. Your message regarding "${subject}" has been successfully submitted. Our team will contact you shortly.`);
+      
+      document.getElementById('contact-form').reset();
+      document.querySelectorAll('#contact-form .form-control').forEach(el => el.classList.remove('is-valid', 'is-invalid'));
+    }
+
+    // -------------------------------------------------------------
+    // REAL-TIME EVENT LISTENERS ATTACHMENT
+    // -------------------------------------------------------------
+    function setupRealtimeFormValidation() {
+      // 1. Sign In Form
+      const loginEmail = document.getElementById('login-email');
+      const loginPass = document.getElementById('login-password');
+
+      if (loginEmail) {
+        loginEmail.addEventListener('input', () => {
+          if (loginEmail.classList.contains('is-invalid') || loginEmail.value.length > 5) {
+            validateLoginEmail(true);
+          }
+        });
+        loginEmail.addEventListener('blur', () => {
+          if (loginEmail.value.length > 0) validateLoginEmail(true);
+        });
+      }
+
+      if (loginPass) {
+        loginPass.addEventListener('input', () => {
+          if (loginPass.classList.contains('is-invalid') || loginPass.value.length > 0) {
+            validateLoginPassword(true);
+          }
+        });
+        loginPass.addEventListener('blur', () => {
+          if (loginPass.value.length > 0) validateLoginPassword(true);
+        });
+      }
+
+      // 2. Registration Form
+      const regName = document.getElementById('reg-name');
+      const regOwner = document.getElementById('reg-owner');
+      const regCity = document.getElementById('reg-city');
+      const regEmail = document.getElementById('reg-email');
+      const regPhone = document.getElementById('reg-phone');
+      const regPass = document.getElementById('reg-password');
+      const regConfirm = document.getElementById('reg-confirm-password');
+
+      if (regName) {
+        regName.addEventListener('input', () => validateRegWorkshopName(regName.classList.contains('is-invalid')));
+        regName.addEventListener('blur', () => { if (regName.value.length > 0) validateRegWorkshopName(true); });
+      }
+
+      if (regOwner) {
+        regOwner.addEventListener('input', () => validateRegOwnerName(regOwner.classList.contains('is-invalid')));
+        regOwner.addEventListener('blur', () => { if (regOwner.value.length > 0) validateRegOwnerName(true); });
+      }
+
+      if (regCity) {
+        regCity.addEventListener('input', () => validateRegCity(regCity.classList.contains('is-invalid')));
+        regCity.addEventListener('blur', () => { if (regCity.value.length > 0) validateRegCity(true); });
+      }
+
+      if (regEmail) {
+        regEmail.addEventListener('input', () => validateRegEmail(regEmail.classList.contains('is-invalid')));
+        regEmail.addEventListener('blur', () => { if (regEmail.value.length > 0) validateRegEmail(true); });
+      }
+
+      if (regPhone) {
+        regPhone.addEventListener('input', () => {
+          // Keep numeric only
+          regPhone.value = regPhone.value.replace(/[^\d]/g, '');
+          validateRegPhone(regPhone.classList.contains('is-invalid'));
+        });
+        regPhone.addEventListener('blur', () => { if (regPhone.value.length > 0) validateRegPhone(true); });
+      }
+
+      if (regPass) {
+        regPass.addEventListener('input', () => {
+          validateRegPassword(regPass.classList.contains('is-invalid'));
+          if (regConfirm && regConfirm.value.length > 0) validateRegConfirmPassword(true);
+        });
+        regPass.addEventListener('blur', () => { if (regPass.value.length > 0) validateRegPassword(true); });
+      }
+
+      if (regConfirm) {
+        regConfirm.addEventListener('input', () => validateRegConfirmPassword(regConfirm.classList.contains('is-invalid')));
+        regConfirm.addEventListener('blur', () => { if (regConfirm.value.length > 0) validateRegConfirmPassword(true); });
+      }
+
+      // 3. Contact Form
+      const cName = document.getElementById('contact-name');
+      const cEmail = document.getElementById('contact-email');
+      const cPhone = document.getElementById('contact-phone');
+      const cSubject = document.getElementById('contact-subject');
+      const cMsg = document.getElementById('contact-message');
+
+      if (cName) {
+        cName.addEventListener('input', () => validateContactName(cName.classList.contains('is-invalid')));
+        cName.addEventListener('blur', () => { if (cName.value.length > 0) validateContactName(true); });
+      }
+
+      if (cEmail) {
+        cEmail.addEventListener('input', () => validateContactEmail(cEmail.classList.contains('is-invalid')));
+        cEmail.addEventListener('blur', () => { if (cEmail.value.length > 0) validateContactEmail(true); });
+      }
+
+      if (cPhone) {
+        cPhone.addEventListener('input', () => {
+          cPhone.value = cPhone.value.replace(/[^\d]/g, '');
+          validateContactPhone(cPhone.classList.contains('is-invalid'));
+        });
+        cPhone.addEventListener('blur', () => { if (cPhone.value.length > 0) validateContactPhone(true); });
+      }
+
+      if (cSubject) {
+        cSubject.addEventListener('input', () => validateContactSubject(cSubject.classList.contains('is-invalid')));
+        cSubject.addEventListener('blur', () => { if (cSubject.value.length > 0) validateContactSubject(true); });
+      }
+
+      if (cMsg) {
+        cMsg.addEventListener('input', () => validateContactMessage(cMsg.classList.contains('is-invalid')));
+        cMsg.addEventListener('blur', () => { if (cMsg.value.length > 0) validateContactMessage(true); });
+      }
+    }
+
+    // -------------------------------------------------------------
+    // WORKSHOP PORTAL
+    // -------------------------------------------------------------
+    function renderWorkspace() {
+      let currentShop = null;
+      if (state.currentUser && state.currentUser.workshopId) {
+        currentShop = state.workshops.find(w => w.id === state.currentUser.workshopId);
+      }
+      if (!currentShop) {
+        currentShop = state.workshops.find(w => w.status === 'Approved') || state.workshops[0];
+      }
+
+      document.getElementById('portal-workshop-name').textContent = currentShop.name;
+      document.getElementById('portal-workshop-meta').textContent = `Facility ID: #${currentShop.id} · Owner: ${currentShop.owner} · Location: ${currentShop.city}`;
+
+      renderJobCardsTable();
+      renderInventoryGrid();
+    }
+
+    function handleJobCardSubmit(e) {
+      e.preventDefault();
+
+      let targetShopId = 'WC-101';
+      if (state.currentUser && state.currentUser.workshopId) {
+        targetShopId = state.currentUser.workshopId;
+      }
+
+      const custName = document.getElementById('intake-name').value.trim();
+      const phone = document.getElementById('intake-phone').value.trim();
+      const car = document.getElementById('intake-car').value.trim();
+      const plate = document.getElementById('intake-plate').value.trim().toUpperCase();
+      const fault = document.getElementById('intake-fault').value.trim();
+      const bay = document.getElementById('intake-bay').value;
+      const cost = Number(document.getElementById('intake-amount').value) || 3500;
+
+      const newJobId = 'JOB-' + Math.floor(904 + Math.random() * 800);
+      const newJob = {
+        id: newJobId,
+        workshopId: targetShopId,
+        customer: custName,
+        phone: phone,
+        car: car,
+        plate: plate,
+        fault: fault,
+        bay: bay,
+        cost: cost,
+        status: 'In Bay',
+        timestamp: 'Just Now'
+      };
+
+      state.jobs.unshift(newJob);
+      saveState();
+      addAuditLog(`Job Card ${newJobId} created for ${car} (${plate})`);
+
+      document.getElementById('intake-form').reset();
+      document.getElementById('intake-amount').value = '3500';
+
+      renderJobCardsTable();
+
+      const toast = document.createElement('div');
+      toast.className = 'alert alert-success position-fixed bottom-0 end-0 m-3 shadow-lg z-3 font-mono-code small';
+      toast.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>Job Card <strong>${newJobId}</strong> Created!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function renderJobCardsTable() {
+      const tbody = document.getElementById('job-cards-tbody');
+      const noJobsMsg = document.getElementById('no-jobs-msg');
+      const query = (document.getElementById('job-search')?.value || '').toLowerCase().trim();
+
+      if (!tbody) return;
+
+      const filtered = state.jobs.filter(j => 
+        j.plate.toLowerCase().includes(query) ||
+        j.customer.toLowerCase().includes(query) ||
+        j.car.toLowerCase().includes(query)
+      );
+
+      const totalCount = state.jobs.length;
+      const activeCount = state.jobs.filter(j => j.status === 'In Bay').length;
+      const compCount = state.jobs.filter(j => j.status === 'Completed').length;
+      const totalRev = state.jobs.reduce((acc, j) => acc + (Number(j.cost) || 0), 0);
+
+      document.getElementById('metric-total-jobs').textContent = totalCount;
+      document.getElementById('metric-active-jobs').textContent = activeCount;
+      document.getElementById('metric-done-jobs').textContent = compCount;
+      document.getElementById('metric-revenue').textContent = `Rs. ${totalRev.toLocaleString()}`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        noJobsMsg.classList.remove('d-none');
+        return;
+      }
+
+      noJobsMsg.classList.add('d-none');
+      tbody.innerHTML = filtered.map(j => {
+        const isInBay = j.status === 'In Bay';
+        return `
+          <tr>
+            <td class="font-mono-code fw-bold text-danger">${j.id}</td>
+            <td>
+              <div class="fw-bold text-white">${j.car}</div>
+              <span class="badge bg-dark border border-secondary font-mono-code text-light">${j.plate}</span>
+            </td>
+            <td>
+              <div class="text-white">${j.customer}</div>
+              <div class="small text-secondary font-mono-code">${j.phone}</div>
+            </td>
+            <td>
+              <span class="badge bg-secondary font-mono-code small">${j.bay}</span>
+            </td>
+            <td>
+              <div class="small text-light" style="max-width: 240px;">${j.fault}</div>
+              <small class="text-secondary font-mono-code" style="font-size: 0.7rem;">${j.timestamp}</small>
+            </td>
+            <td class="font-mono-code fw-bold text-white">Rs. ${Number(j.cost).toLocaleString()}</td>
+            <td>
+              <button onclick="toggleJobStatus('${j.id}')" class="btn btn-sm p-0 border-0" title="Click to toggle status">
+                <span class="status-badge ${isInBay ? 'status-pending' : 'status-approved'}">
+                  ${isInBay ? '<i class="bi bi-hourglass-split me-1"></i>In Bay' : '<i class="bi bi-check2-all me-1"></i>Completed'}
+                </span>
+              </button>
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <button onclick="openSlipModal('${j.id}')" class="btn btn-outline-light" title="Print Slip">
+                  <i class="bi bi-printer"></i>
+                </button>
+                <button onclick="toggleJobStatus('${j.id}')" class="btn ${isInBay ? 'btn-outline-success' : 'btn-outline-warning'}" title="Toggle Complete">
+                  <i class="bi ${isInBay ? 'bi-check-lg' : 'bi-arrow-clockwise'}"></i>
+                </button>
+                <button onclick="deleteJobCard('${j.id}')" class="btn btn-outline-danger" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleJobStatus(jobId) {
+      const job = state.jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      job.status = job.status === 'In Bay' ? 'Completed' : 'In Bay';
+      saveState();
+      addAuditLog(`Job ${jobId} status toggled to: ${job.status}`);
+      renderJobCardsTable();
+    }
+
+    function deleteJobCard(jobId) {
+      if (confirm(`Delete Job Card ${jobId}?`)) {
+        state.jobs = state.jobs.filter(j => j.id !== jobId);
+        saveState();
+        addAuditLog(`Job Card ${jobId} deleted.`);
+        renderJobCardsTable();
+      }
+    }
+
+    function renderInventoryGrid() {
+      const container = document.getElementById('inventory-grid');
+      if (!container) return;
+
+      container.innerHTML = INVENTORY_PARTS.map(part => {
+        const isLow = part.stock <= part.min;
+        return `
+          <div class="col-md-6 col-lg-4">
+            <div class="p-3 wc-card-inner rounded-3 h-100 d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <span class="badge bg-dark border border-secondary font-mono-code text-secondary" style="font-size: 0.7rem;">${part.sku}</span>
+                  <span class="badge ${isLow ? 'bg-danger text-white' : 'bg-success bg-opacity-25 text-success'} font-mono-code" style="font-size: 0.7rem;">
+                    ${isLow ? 'LOW STOCK' : 'IN STOCK'}
+                  </span>
+                </div>
+                <div class="fw-bold text-white small">${part.name}</div>
+              </div>
+              <div class="d-flex justify-content-between align-items-end mt-3 pt-2 border-top border-secondary border-opacity-25">
+                <div>
+                  <small class="text-secondary font-mono-code" style="font-size: 0.72rem;">Available Qty:</small>
+                  <div class="fs-5 fw-bold font-mono-code text-white">${part.stock} ${part.unit}</div>
+                </div>
+                <div class="text-end">
+                  <small class="text-secondary font-mono-code" style="font-size: 0.72rem;">Retail Price:</small>
+                  <div class="fw-bold font-mono-code text-danger">Rs. ${part.price.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function quickFillCar() {
+      const samples = [
+        { name: 'Kashif Mehmood', phone: '03127890123', car: 'Kia Sportage AWD', plate: 'ISB-6622', fault: 'Engine oil replacement + spark plugs check', cost: 5500 },
+        { name: 'Dr. Salman Raza', phone: '03014455667', car: 'Toyota Yaris 1.5 ATIV', plate: 'LEE-4091', fault: 'Brake pad squeal & front suspension noise', cost: 3800 },
+        { name: 'Zeeshan Akhtar', phone: '03349988776', car: 'Honda Civic X 1.8 i-VTEC', plate: 'FD-1802', fault: 'Check Engine light OBD code scanning & throttle clean', cost: 4200 }
+      ];
+      const pick = samples[Math.floor(Math.random() * samples.length)];
+
+      document.getElementById('intake-name').value = pick.name;
+      document.getElementById('intake-phone').value = pick.phone;
+      document.getElementById('intake-car').value = pick.car;
+      document.getElementById('intake-plate').value = pick.plate;
+      document.getElementById('intake-fault').value = pick.fault;
+      document.getElementById('intake-amount').value = pick.cost;
+    }
+
+    // -------------------------------------------------------------
+    // SUPER ADMIN CONSOLE
+    // -------------------------------------------------------------
+    function renderAdmin() {
+      renderPendingQueue();
+      renderAllWorkshops();
+      renderAuditLogs();
+    }
+
+    function renderPendingQueue() {
+      const tbody = document.getElementById('admin-pending-tbody');
+      const badge = document.getElementById('admin-pending-badge');
+      const noPendingMsg = document.getElementById('admin-no-pending-msg');
+
+      if (!tbody) return;
+
+      const pending = state.workshops.filter(w => w.status === 'Pending');
+      badge.textContent = `${pending.length} PENDING`;
+
+      if (pending.length === 0) {
+        tbody.innerHTML = '';
+        noPendingMsg.classList.remove('d-none');
+        return;
+      }
+
+      noPendingMsg.classList.add('d-none');
+      tbody.innerHTML = pending.map(w => `
+        <tr>
+          <td>
+            <div class="fw-bold text-white">${w.name}</div>
+            <span class="badge bg-dark border border-secondary font-mono-code text-secondary" style="font-size: 0.68rem;">ID: ${w.id}</span>
+          </td>
+          <td class="text-white">${w.owner}</td>
+          <td>
+            <div class="font-mono-code small text-light">${w.email}</div>
+            <div class="font-mono-code small text-secondary">${w.phone}</div>
+          </td>
+          <td class="text-secondary small">${w.city}</td>
+          <td class="font-mono-code small text-secondary">${w.appliedDate}</td>
+          <td>
+            <span class="status-badge status-pending">PENDING</span>
+          </td>
+          <td class="text-end">
+            <button onclick="approveWorkshop('${w.id}')" class="btn btn-sm btn-success fw-bold font-mono-code me-1">
+              <i class="bi bi-check-circle-fill me-1"></i>Approve
+            </button>
+            <button onclick="rejectWorkshop('${w.id}')" class="btn btn-sm btn-outline-danger font-mono-code">
+              <i class="bi bi-x-circle me-1"></i>Reject
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderAllWorkshops() {
+      const tbody = document.getElementById('admin-all-workshops-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = state.workshops.map(w => {
+        const isApproved = w.status === 'Approved';
+        const isSuspended = w.status === 'Suspended';
+        return `
+          <tr>
+            <td>
+              <div class="fw-bold text-white">${w.name}</div>
+              <small class="text-secondary font-mono-code" style="font-size: 0.72rem;">ID: ${w.id}</small>
+            </td>
+            <td class="text-white">${w.owner}</td>
+            <td class="font-mono-code small text-secondary">${w.email}</td>
+            <td class="small text-secondary">${w.city}</td>
+            <td class="font-mono-code text-white">Rs. ${w.fee.toLocaleString()}/mo</td>
+            <td>
+              <span class="status-badge ${isApproved ? 'status-approved' : isSuspended ? 'status-suspended' : 'status-pending'}">
+                ${w.status.toUpperCase()}
+              </span>
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                ${isApproved ? `
+                  <button onclick="suspendWorkshop('${w.id}')" class="btn btn-outline-danger font-mono-code">
+                    <i class="bi bi-pause-circle me-1"></i>Suspend
+                  </button>
+                ` : isSuspended ? `
+                  <button onclick="reactivateWorkshop('${w.id}')" class="btn btn-outline-success font-mono-code">
+                    <i class="bi bi-play-circle me-1"></i>Reactivate
+                  </button>
+                ` : `
+                  <button onclick="approveWorkshop('${w.id}')" class="btn btn-outline-success font-mono-code">
+                    <i class="bi bi-check-circle me-1"></i>Approve
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function approveWorkshop(shopId) {
+      const shop = state.workshops.find(w => w.id === shopId);
+      if (!shop) return;
+
+      shop.status = 'Approved';
+      saveState();
+      addAuditLog(`Super Admin approved workshop: ${shop.name} (${shop.owner}). License unlocked.`);
+      dismissNotificationBanner();
+      renderAdmin();
+
+      const toast = document.createElement('div');
+      toast.className = 'alert alert-success position-fixed bottom-0 end-0 m-3 shadow-lg z-3 font-mono-code small';
+      toast.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>Workshop <strong>${shop.name}</strong> Approved & Unlocked!`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function suspendWorkshop(shopId) {
+      const shop = state.workshops.find(w => w.id === shopId);
+      if (!shop) return;
+
+      if (confirm(`Suspend commercial license for ${shop.name}?`)) {
+        shop.status = 'Suspended';
+        saveState();
+        addAuditLog(`Super Admin suspended license for: ${shop.name}.`);
+        renderAdmin();
+      }
+    }
+
+    function reactivateWorkshop(shopId) {
+      const shop = state.workshops.find(w => w.id === shopId);
+      if (!shop) return;
+
+      shop.status = 'Approved';
+      saveState();
+      addAuditLog(`Super Admin reactivated license for: ${shop.name}.`);
+      renderAdmin();
+    }
+
+    function rejectWorkshop(shopId) {
+      const shop = state.workshops.find(w => w.id === shopId);
+      if (!shop) return;
+
+      if (confirm(`Reject registration for ${shop.name}?`)) {
+        state.workshops = state.workshops.filter(w => w.id !== shopId);
+        saveState();
+        addAuditLog(`Super Admin rejected registration for: ${shop.name}.`);
+        renderAdmin();
+      }
+    }
+
+    function renderAuditLogs() {
+      const container = document.getElementById('admin-logs-box');
+      if (!container) return;
+
+      if (state.auditLogs.length === 0) {
+        container.innerHTML = '<div class="text-secondary p-2">No audit events recorded.</div>';
+        return;
+      }
+
+      container.innerHTML = state.auditLogs.map(log => `
+        <div class="py-1.5 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <span class="text-danger fw-bold me-1">[LOG]</span>
+            <span class="text-light">${log.text}</span>
+          </div>
+          <span class="text-secondary shrink-0 font-mono-code" style="font-size: 0.72rem;">${log.time}</span>
+        </div>
+      `).join('');
+    }
+
+    // -------------------------------------------------------------
+    // THERMAL SLIP MODAL
+    // -------------------------------------------------------------
+    function openSlipModal(jobId) {
+      const job = state.jobs.find(j => j.id === jobId);
+      if (!job) return;
+
+      const shop = state.workshops.find(w => w.id === job.workshopId) || state.workshops[0];
+      document.getElementById('slip-shop-name').textContent = shop.name;
+
+      const detailsEl = document.getElementById('slip-details-container');
+      detailsEl.innerHTML = `
+        <div class="d-flex justify-content-between pb-1 border-bottom border-secondary">
+          <span class="text-secondary">DIGITAL JOB ID:</span>
+          <span class="fw-bold text-danger">${job.id}</span>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+          <span class="text-secondary">VEHICLE DETAILS:</span>
+          <span class="text-white">${job.car}</span>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+          <span class="text-secondary">REGISTRATION PLATE:</span>
+          <span class="fw-bold text-white">${job.plate}</span>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+          <span class="text-secondary">CUSTOMER OWNER:</span>
+          <span class="text-white">${job.customer} (${job.phone})</span>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+          <span class="text-secondary">ASSIGNED BAY:</span>
+          <span class="text-info">${job.bay}</span>
+        </div>
+        <div class="py-1 border-bottom border-secondary">
+          <div class="text-secondary">FAULT DESCRIPTION:</div>
+          <div class="text-white">${job.fault}</div>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
+          <span class="text-secondary">ESTIMATED INVOICE:</span>
+          <span class="fw-bold text-success">Rs. ${Number(job.cost).toLocaleString()}</span>
+        </div>
+        <div class="d-flex justify-content-between pt-1">
+          <span class="text-secondary">CURRENT STATUS:</span>
+          <span class="badge ${job.status === 'In Bay' ? 'bg-warning text-dark' : 'bg-success'} font-mono-code">${job.status}</span>
+        </div>
+      `;
+
+      const modal = new bootstrap.Modal(document.getElementById('jobSlipModal'));
+      modal.show();
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION
+    // -------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      updateNavAuthState();
+      setupRealtimeFormValidation();
+      renderJobCardsTable();
+      renderInventoryGrid();
+      renderAdmin();
+    });
+  </script>
+</body>
+</html>
